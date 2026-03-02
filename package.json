@@ -1,0 +1,26 @@
+{
+  "name": "reader-core",
+  "version": "0.1.0",
+  "description": "Standalone Puppeteer + Readability + Turndown pipeline for extracting LLM-friendly markdown from URLs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.5.0",
+    "linkedom": "^0.18.0",
+    "lodash": "^4.17.21",
+    "puppeteer": "^24.0.0",
+    "turndown": "^7.2.0",
+    "turndown-plugin-gfm": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.0",
+    "@types/turndown": "^5.0.5",
+    "tsx": "^4.0.0",
+    "typescript": "^5.5.0"
+  },
+  "license": "Apache-2.0"
+}
