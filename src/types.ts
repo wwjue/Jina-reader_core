@@ -33,6 +33,31 @@ export interface ReadabilityParsed {
     publishedTime: string;
 }
 
+export interface SearchResult {
+    link: string;
+    title: string;
+    source?: string;
+    date?: string;
+    snippet?: string;
+    imageUrl?: string;
+    siteLinks?: { link: string; title: string; snippet?: string }[];
+}
+
+export interface SearchOptions {
+    /** Number of results per page (default: 10) */
+    num?: number;
+    /** Page number (default: 1) */
+    page?: number;
+    /** Country code (e.g. 'us') */
+    gl?: string;
+    /** Language code (e.g. 'en') */
+    hl?: string;
+    /** Navigation timeout in milliseconds (default: 30000) */
+    timeout?: number;
+    /** Run browser in headless mode (default: true) */
+    headless?: boolean;
+}
+
 export interface PageSnapshot {
     title: string;
     description?: string;

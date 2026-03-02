@@ -4,7 +4,9 @@ import { toMarkdown } from './formatter.js';
 import type { ReadResult, ReadOptions, PageSnapshot } from './types.js';
 
 export type { ReadResult, ReadOptions };
+export type { SearchResult, SearchOptions } from './types.js';
 export { closeBrowser };
+export { searchGoogle } from './search.js';
 
 const pLinkedom = import('linkedom');
 
@@ -80,25 +82,42 @@ export async function readUrl(url: string, options?: ReadOptions): Promise<ReadR
 
 // CLI entry point
 if (require.main === module || process.argv[1]?.endsWith('index.ts')) {
-    const url = process.argv[2];
-    if (!url) {
+    const isSearch = process.argv[2] === '--search';
+    const arg = isSearch ? process.argv[3] : process.argv[2];
+
+    if (!arg) {
         console.error('Usage: npx tsx src/index.ts <url>');
+        console.error('       npx tsx src/index.ts --search <query>');
         process.exit(1);
     }
 
-    readUrl(url)
-        .then((result) => {
-            console.log(`Title: ${result.title}`);
-            console.log(`URL: ${result.url}`);
-            if (result.description) console.log(`Description: ${result.description}`);
-            if (result.byline) console.log(`Author: ${result.byline}`);
-            if (result.publishedTime) console.log(`Published: ${result.publishedTime}`);
-            if (result.lang) console.log(`Language: ${result.lang}`);
-            console.log(`\nMarkdown Content:\n${result.markdown}`);
-        })
-        .catch((err) => {
-            console.error('Error:', err);
-            process.exit(1);
-        })
-        .finally(() => closeBrowser());
+    if (isSearch) {
+        import('./search.js').then(({ searchGoogle }) =>
+            searchGoogle(arg)
+                .then((results) => {
+                    console.log(JSON.stringify(results, null, 2));
+                })
+                .catch((err) => {
+                    console.error('Error:', err);
+                    process.exit(1);
+                })
+                .finally(() => closeBrowser())
+        );
+    } else {
+        readUrl(arg)
+            .then((result) => {
+                console.log(`Title: ${result.title}`);
+                console.log(`URL: ${result.url}`);
+                if (result.description) console.log(`Description: ${result.description}`);
+                if (result.byline) console.log(`Author: ${result.byline}`);
+                if (result.publishedTime) console.log(`Published: ${result.publishedTime}`);
+                if (result.lang) console.log(`Language: ${result.lang}`);
+                console.log(`\nMarkdown Content:\n${result.markdown}`);
+            })
+            .catch((err) => {
+                console.error('Error:', err);
+                process.exit(1);
+            })
+            .finally(() => closeBrowser());
+    }
 }
