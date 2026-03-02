@@ -314,7 +314,9 @@ function buildSearchUrl(query: string, options: SearchOptions = {}): string {
     url.searchParams.set('q', query);
 
     const num = options.num || 10;
-    url.searchParams.set('num', `${num}`);
+    // Request extra results since Google may return fewer organic results
+    // than requested due to featured snippets, filters, etc.
+    url.searchParams.set('num', `${num + 6}`);
 
     if (options.page && options.page > 1) {
         url.searchParams.set('start', `${(options.page - 1) * num}`);
@@ -365,7 +367,7 @@ export async function searchGoogle(query: string, options?: SearchOptions): Prom
         });
 
         await page.goto(searchUrl, {
-            waitUntil: ['load', 'domcontentloaded', 'networkidle0'],
+            waitUntil: 'domcontentloaded',
             timeout,
         });
 
@@ -451,7 +453,7 @@ export async function searchGoogle(query: string, options?: SearchOptions): Prom
                 });
         }) as SearchResult[];
 
-        return results || [];
+        return (results || []).slice(0, options?.num || 10);
     } finally {
         await page.close().catch(() => {});
         await context.close().catch(() => {});

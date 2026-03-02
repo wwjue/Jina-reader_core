@@ -41,3 +41,10 @@ export async function closeBrowser(): Promise<void> {
     browser = null;
     launching = null;
 }
+
+// Kill Chromium on abrupt exit (Windows Ctrl+C doesn't run async SIGINT handlers)
+process.on('exit', () => {
+    if (browser?.connected) {
+        browser.process()?.kill();
+    }
+});

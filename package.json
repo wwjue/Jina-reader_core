@@ -6,10 +6,12 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "serve": "tsc && node dist/server.js"
   },
   "dependencies": {
     "@mozilla/readability": "^0.5.0",
+    "fastify": "^5.0.0",
     "linkedom": "^0.18.0",
     "lodash": "^4.17.21",
     "puppeteer": "^24.0.0",

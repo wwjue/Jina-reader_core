@@ -7,6 +7,7 @@ export type { ReadResult, ReadOptions };
 export type { SearchResult, SearchOptions } from './types.js';
 export { closeBrowser };
 export { searchGoogle } from './search.js';
+export { startServer } from './server.js';
 
 const pLinkedom = import('linkedom');
 

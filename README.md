@@ -26,6 +26,53 @@ await closeBrowser();
 
 ```bash
 npx tsx src/index.ts https://example.com
+npx tsx src/index.ts --search "your query"
+```
+
+## HTTP server
+
+Run the built-in Fastify server to expose `readUrl` and `searchGoogle` as JSON API endpoints:
+
+```bash
+npm run serve            # listens on port 3000
+PORT=8080 npm run serve  # custom port
+```
+
+**Endpoints**
+
+| Endpoint | Required | Optional | Returns |
+|---|---|---|---|
+| `GET /read?url=...` | `url` | `timeout` | `ReadResult` object |
+| `GET /search?q=...` | `q` | `num`, `page`, `gl`, `hl` | `{ results: SearchResult[] }` |
+
+**Example**
+
+```bash
+curl "http://localhost:3000/read?url=https://example.com"
+curl "http://localhost:3000/search?q=nodejs+tutorial&num=3"
+```
+
+```python
+import httpx
+
+BASE = "http://localhost:3000"
+
+# web_fetch
+r = httpx.get(f"{BASE}/read", params={"url": "https://example.com"}, timeout=60)
+print(r.json()["markdown"])
+
+# web_search
+r = httpx.get(f"{BASE}/search", params={"q": "nodejs tutorial", "num": 5}, timeout=60)
+for item in r.json()["results"]:
+    print(item["title"], item["link"])
+```
+
+You can also start the server programmatically:
+
+```typescript
+import { startServer } from 'reader-core';
+
+const app = await startServer(3000);
 ```
 
 ## API
@@ -72,6 +119,51 @@ Closes the shared Puppeteer browser instance. Call this when you're done making 
 await closeBrowser();
 ```
 
+### `searchGoogle(query, options?)`
+
+Searches Google and returns structured results.
+
+```typescript
+import { searchGoogle, closeBrowser } from 'reader-core';
+
+const results = await searchGoogle('nodejs tutorial', { num: 5 });
+console.log(results);
+await closeBrowser();
+```
+
+**Options**
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `num` | `number` | `10` | Number of results per page |
+| `page` | `number` | `1` | Page number |
+| `gl` | `string` | — | Country code (e.g. `'us'`) |
+| `hl` | `string` | — | Language code (e.g. `'en'`) |
+| `timeout` | `number` | `30000` | Navigation timeout in milliseconds |
+| `headless` | `boolean` | `true` | Run the browser in headless mode |
+
+**Return value (`SearchResult[]`)**
+
+| Field | Type | Description |
+|---|---|---|
+| `link` | `string` | Result URL |
+| `title` | `string` | Result title |
+| `source` | `string?` | Source site name |
+| `date` | `string?` | Date string |
+| `snippet` | `string?` | Result snippet |
+| `imageUrl` | `string?` | Thumbnail URL |
+| `siteLinks` | `array?` | Sub-links with `link`, `title`, `snippet` |
+
+### `startServer(port?)`
+
+Starts the Fastify HTTP server. Defaults to port `3000`.
+
+```typescript
+import { startServer } from 'reader-core';
+
+const app = await startServer(8080);
+```
+
 ## How it works
 
 1. **Browser** &mdash; A shared headless Chromium instance is lazily launched on the first call and reused across requests.
@@ -88,7 +180,9 @@ reader-core/
 ├── tsconfig.json
 └── src/
     ├── index.ts       — readUrl() entry point + CLI
+    ├── server.ts      — Fastify HTTP server
     ├── browser.ts     — Shared Puppeteer browser lifecycle
+    ├── search.ts      — Google search via Puppeteer
     ├── snapshot.ts     — Scripts injected into the browser page
     ├── formatter.ts   — Turndown markdown conversion pipeline
     └── types.ts       — TypeScript interfaces
