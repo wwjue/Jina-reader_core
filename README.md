@@ -31,11 +31,11 @@ npx tsx src/index.ts --search "your query"
 
 ## HTTP server
 
-Run the built-in Fastify server to expose `readUrl` and `searchGoogle` as JSON API endpoints:
+Run the built-in Fastify server to expose `readUrl` and `searchGoogle` as JSON API endpoints. The server supports concurrent requests — each request gets its own browser context within a shared Chromium instance.
 
 ```bash
-npm run serve            # listens on port 3000
-PORT=8080 npm run serve  # custom port
+npm run serve              # builds then listens on port 3000
+PORT=8080 npm run serve    # custom port
 ```
 
 **Endpoints**
