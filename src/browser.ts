@@ -18,6 +18,7 @@ export async function getBrowser(headless: boolean = true): Promise<Browser> {
         args: [
             '--disable-dev-shm-usage',
             '--disable-blink-features=AutomationControlled',
+            '--no-sandbox',
         ],
     }).then((b) => {
         browser = b;
