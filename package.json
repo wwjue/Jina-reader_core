@@ -1,6 +1,6 @@
 {
   "name": "reader-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Standalone Puppeteer + Readability + Turndown pipeline for extracting LLM-friendly markdown from URLs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
